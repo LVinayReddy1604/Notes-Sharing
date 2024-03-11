@@ -1,8 +1,55 @@
 <?php include 'includes/connection.php';?>
+
+<?php
+session_start();
+if (isset($_POST['login'])) {
+  $username  = $_POST['user'];
+  $password = $_POST['pass'];
+  mysqli_real_escape_string($conn, $username);
+  mysqli_real_escape_string($conn, $password);
+$query = "SELECT * FROM users WHERE username = '$username'";
+$result = mysqli_query($conn , $query) or die (mysqli_error($conn));
+if (mysqli_num_rows($result) > 0) {
+  while ($row = mysqli_fetch_array($result)) {
+    $id = $row['id'];
+    $user = $row['username'];
+    $pass = $row['password'];
+    $name = $row['name'];
+    $email = $row['email'];
+    $role= $row['role'];
+    $course = $row['course'];
+    if (password_verify($password, $pass )) {
+      $_SESSION['id'] = $id;
+      $_SESSION['username'] = $username;
+      $_SESSION['name'] = $name;
+      $_SESSION['email']  = $email;
+      $_SESSION['role'] = $role;
+      $_SESSION['course'] = $course;
+      header('location: dashboard/');
+    }
+    else {
+      echo "<script>alert('invalid username/password');
+      window.location.href= 'index.php';</script>";
+
+    }
+  }
+}
+else {
+      echo "<script>alert('invalid username/password');
+      window.location.href= 'index.php';</script>";
+
+    }
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+<script src="dashboard/js/tinymce/tinymce.min.js"></script>
+    <script src="dashboard/js/tinymce/script.js"></script>
+	<link href="dashboard/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
@@ -253,27 +300,29 @@
                   <div class="col-md-6 col-lg-7 d-flex align-items-center">
                     <div class="card-body p-4 p-lg-5 text-black">
       
-                      <form name="Login" onsubmit="required()">
+                      <form name="Login" method="POST">
       
                         <div class="d-flex align-items-center mb-3 pb-1">
                           <i class="fas fa-cubes fa-2x me-3" style="color: #ff6219;"></i>
                           <span class="h1 fw-bold mb-0">Logo</span>
                         </div>
       
-                        <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your account</h5>
+                        <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Login into your account</h5>
       
                         <div class="form-outline mb-4">
-                          <input type="text" id="form2Example17" class="form-control form-control-lg" name="username" />
-                          <label class="form-label" for="form2Example17">Username</label>
+                          <input type="text" id="form2Example17" name="user" class="form-control form-control-lg" placeholder="Username" required=""/>
                         </div>
       
                         <div class="form-outline mb-4">
-                          <input type="password" id="form2Example27" class="form-control form-control-lg" name="password" />
-                          <label class="form-label" for="form2Example27">Password</label>
+                          <input type="password" id="form2Example27" class="form-control form-control-lg" name="pass" placeholder="Password" required=""/>
                         </div>
       
+                        <div class="form-outline mb-4">
+                          <a href="signup.php">Register</a> • <a href="recoverpassword.php">Forgot Password</a>
+                        </div>
+                        
                         <div class="pt-1 mb-4">
-                          <input type="submit" value="submit" class="btn btn-dark btn-lg btn-block" href="login.php" type="button" name="submit-btn" onclick="required()"></input>
+                          <input type="submit" class="btn btn-dark btn-lg btn-block" type="button" name="login"  value="login"></input>
                           <!-- <a class="btn btn-dark btn-lg btn-block" href="index.html" type="button" name="submit-btn">Login</a> -->
                         </div>
 
@@ -295,9 +344,9 @@
   <header id="header" class="fixed-top ">
     <div class="container d-flex align-items-center">
 
-      <h1 class="logo me-auto"><a href="notes.html">CU Edu-Link</a></h1>
+      <h1 class="logo me-auto"><a href="dashboard/notes.php">CU Edu-Link</a></h1>
       <!-- Uncomment below if you prefer to use an image logo -->
-      <a href="index.html" class="logo me-auto"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>
+      <a href="index.php" class="logo me-auto"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>
 
       <nav id="navbar" class="navbar">
         <ul>
